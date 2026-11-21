@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="wrap">
+        <h1>Find work in Cambodia, then apply in two minutes.</h1>
+        <form class="finder" action="{{ url_for('home') }}" method="get" role="search">
+            <div class="finder-main">
+                <label class="sr" for="q">Search jobs</label>
+                <input id="q" type="search" name="q" value="{{ q }}" placeholder="Job title, company, or keyword">
+                <button type="submit">Search jobs</button>
+            </div>
+            <div class="finder-filters">
+                <label>Location
+                    <select name="location">
+                        <option value="">Anywhere</option>
+                        {% for l in locations %}
+                            <option value="{{ l }}" {{ 'selected' if l == location }}>{{ l }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Category
+                    <select name="category">
+                        <option value="">All categories</option>
+                        {% for c in CATEGORIES %}
+                            <option value="{{ c }}" {{ 'selected' if c == category }}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Job type
+                    <select name="job_type">
+                        <option value="">Any type</option>
+                        {% for t in JOB_TYPES %}
+                            <option value="{{ t }}" {{ 'selected' if t == job_type }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Sort by
+                    <select name="sort">
+                        <option value="newest" {{ 'selected' if sort != 'salary' }}>Newest first</option>
+                        <option value="salary" {{ 'selected' if sort == 'salary' }}>Highest salary</option>
+                    </select>
+                </label>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="wrap results">
+    <div class="results-head">
+        <h2>{{ jobs|length }} {{ 'job' if jobs|length == 1 else 'jobs' }}{{ ' match your search' if filtered else ' open now' }}</h2>
+        {% if filtered %}<a href="{{ url_for('home') }}">Clear filters</a>{% endif %}
+    </div>
+
+    {% if jobs %}
+    <ul class="joblist">
+        {% for job in jobs %}
+        <li>
+            <a class="jobrow" href="{{ url_for('job_detail', job_id=job.id) }}">
+                <div class="jobrow-main">
+                    <h3>{{ job.title }}</h3>
+                    <p>{{ job.company }} in {{ job.location }}</p>
+                    <p class="tags"><span>{{ job.job_type }}</span><span>{{ job.category }}</span></p>
+                </div>
+                <div class="jobrow-side">
+                    <strong>{{ job|salary }}</strong>
+                    <span>{{ job.created_at|ago }}</span>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+        <p>No jobs match that search. Try a shorter keyword or clear the filters.</p>
+        <p><a class="btn" href="{{ url_for('home') }}">Show all jobs</a> <a class="btn ghost" href="{{ url_for('post_job') }}">Post a job</a></p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

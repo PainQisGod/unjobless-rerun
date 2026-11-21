@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Post a job - Un-Jobless{% endblock %}
+{% block content %}
+<div class="wrap narrow">
+    <h1>Post a job</h1>
+    <p class="lead">Your listing goes live as soon as you publish it.</p>
+
+    {% if errors %}
+    <div class="errors" role="alert">
+        <p>Fix these before publishing:</p>
+        <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <form class="stack" method="post" action="{{ url_for('post_job') }}">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label>Job title
+            <input type="text" name="title" value="{{ form.get('title', '') }}" required maxlength="100">
+        </label>
+        <label>Company
+            <input type="text" name="company" value="{{ form.get('company', '') }}" required maxlength="100">
+        </label>
+        <div class="two">
+            <label>Category
+                <select name="category">
+                    {% for c in CATEGORIES %}<option value="{{ c }}" {{ 'selected' if c == form.get('category') }}>{{ c }}</option>{% endfor %}
+                </select>
+            </label>
+            <label>Job type
+                <select name="job_type">
+                    {% for t in JOB_TYPES %}<option value="{{ t }}" {{ 'selected' if t == form.get('job_type') }}>{{ t }}</option>{% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="two">
+            <label>Minimum salary (USD per month)
+                <input type="text" inputmode="numeric" name="salary_min" value="{{ form.get('salary_min', '') }}" placeholder="500">
+            </label>
+            <label>Maximum salary (USD per month)
+                <input type="text" inputmode="numeric" name="salary_max" value="{{ form.get('salary_max', '') }}" placeholder="800">
+            </label>
+        </div>
+        <label>City or area
+            <input type="text" name="location" value="{{ form.get('location', '') }}" required maxlength="60" placeholder="Phnom Penh, Siem Reap, Remote">
+        </label>
+        <label>Exact address <span class="opt">(optional)</span>
+            <input type="text" name="address" value="{{ form.get('address', '') }}" maxlength="200">
+        </label>
+        <label>Contact phone <span class="opt">(optional)</span>
+            <input type="tel" name="phone" value="{{ form.get('phone', '') }}" maxlength="30">
+        </label>
+        <label>Experience needed <span class="opt">(optional)</span>
+            <input type="text" name="experience" value="{{ form.get('experience', '') }}" maxlength="200">
+        </label>
+        <label>Job description
+            <textarea name="description" rows="7" required maxlength="4000">{{ form.get('description', '') }}</textarea>
+        </label>
+        <button type="submit">Publish job</button>
+    </form>
+</div>
+{% endblock %}

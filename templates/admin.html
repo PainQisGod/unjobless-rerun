@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Admin - Un-Jobless{% endblock %}
+{% block content %}
+<div class="wrap admin">
+    <div class="admin-head">
+        <h1>Admin</h1>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button class="ghost" type="submit">Sign out</button>
+        </form>
+    </div>
+
+    <h2>Jobs ({{ jobs|length }})</h2>
+    <div class="scroll">
+    <table>
+        <thead><tr><th>Job</th><th>Status</th><th>Applications</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for j in jobs %}
+            <tr>
+                <td><a href="{{ url_for('job_detail', job_id=j.id) }}">{{ j.title }}</a><br><small>{{ j.company }}, {{ j.location }}</small></td>
+                <td>{{ 'Live' if j.active else 'Hidden' }}</td>
+                <td>{{ j.apps }}</td>
+                <td class="actions">
+                    <form method="post" action="{{ url_for('admin_toggle', job_id=j.id) }}">
+                        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                        <button class="ghost" type="submit">{{ 'Hide' if j.active else 'Show' }}</button>
+                    </form>
+                    <form method="post" action="{{ url_for('admin_delete_job', job_id=j.id) }}" onsubmit="return confirm('Delete this job and all its applications?');">
+                        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                        <button class="danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <h2>Applications ({{ applications|length }})</h2>
+    {% if applications %}
+    <div class="scroll">
+    <table>
+        <thead><tr><th>Applicant</th><th>Applied for</th><th>Message</th><th>Received</th><th></th></tr></thead>
+        <tbody>
+        {% for a in applications %}
+            <tr>
+                <td>{{ a.name }}<br><a href="mailto:{{ a.email }}">{{ a.email }}</a>{% if a.phone %}<br><small>{{ a.phone }}</small>{% endif %}</td>
+                <td>{{ a.job_title }}<br><small>{{ a.company }}</small></td>
+                <td class="msg">{{ a.message or 'No message' }}</td>
+                <td>{{ a.created_at.replace('T', ' ') }}</td>
+                <td class="actions">
+                    <form method="post" action="{{ url_for('admin_delete_application', app_id=a.id) }}" onsubmit="return confirm('Delete this application?');">
+                        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                        <button class="danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+        <p class="empty">No applications yet. They will show up here when someone applies.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} at {{ job.company }} - Un-Jobless{% endblock %}
+{% block content %}
+<div class="wrap detail">
+    <p class="back"><a href="{{ url_for('home') }}">Back to all jobs</a></p>
+
+    <div class="detail-grid">
+        <article>
+            <h1>{{ job.title }}</h1>
+            <p class="company">{{ job.company }}</p>
+            <p class="tags"><span>{{ job.job_type }}</span><span>{{ job.category }}</span></p>
+
+            <dl class="facts">
+                <div><dt>Salary</dt><dd>{{ job|salary }}</dd></div>
+                <div><dt>Location</dt><dd>{{ job.location }}</dd></div>
+                {% if job.address %}<div><dt>Address</dt><dd>{{ job.address }}</dd></div>{% endif %}
+                {% if job.phone %}<div><dt>Phone</dt><dd><a href="tel:{{ job.phone|replace(' ', '') }}">{{ job.phone }}</a></dd></div>{% endif %}
+                {% if job.experience %}<div><dt>Experience</dt><dd>{{ job.experience }}</dd></div>{% endif %}
+                <div><dt>Posted</dt><dd>{{ job.created_at|ago|replace('Posted ', '') }}</dd></div>
+            </dl>
+
+            <h2>About the job</h2>
+            <p class="desc">{{ job.description }}</p>
+        </article>
+
+        <aside class="apply" id="apply">
+            <h2>Apply for this job</h2>
+            {% if errors %}
+            <div class="errors" role="alert">
+                <p>Fix these before sending:</p>
+                <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            </div>
+            {% endif %}
+            <form method="post" action="{{ url_for('apply', job_id=job.id) }}">
+                <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+                <label>Full name
+                    <input type="text" name="name" value="{{ form.get('name', '') }}" required autocomplete="name">
+                </label>
+                <label>Email
+                    <input type="email" name="email" value="{{ form.get('email', '') }}" required autocomplete="email">
+                </label>
+                <label>Phone <span class="opt">(optional)</span>
+                    <input type="tel" name="phone" value="{{ form.get('phone', '') }}" autocomplete="tel">
+                </label>
+                <label>Message <span class="opt">(optional)</span>
+                    <textarea name="message" rows="5" maxlength="2000" placeholder="Tell them why you're a good fit.">{{ form.get('message', '') }}</textarea>
+                </label>
+                <button type="submit">Send application</button>
+            </form>
+        </aside>
+    </div>
+</div>
+{% endblock %}

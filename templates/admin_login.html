@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin sign in - Un-Jobless{% endblock %}
+{% block content %}
+<div class="wrap narrow small">
+    <h1>Admin sign in</h1>
+    {% if error %}<p class="errors" role="alert">{{ error }}</p>{% endif %}
+    <form class="stack" method="post">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label>Password
+            <input type="password" name="password" required autofocus autocomplete="current-password">
+        </label>
+        <button type="submit">Sign in</button>
+    </form>
+</div>
+{% endblock %}
